@@ -1,0 +1,86 @@
+<head>
+    <title>CLOTHED.</title>
+    <style>
+        body {
+            text-align: center; /* Centre le contenu */
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        header {
+            background-color: #f8f8f8;
+            padding: 10px 0;
+            text-align: left; /* Alignement du titre à gauche */
+            border-bottom: 1px solid #e7e7e7;
+        }
+        .container {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        select {
+            padding: 10px;
+            margin: 10px;
+        }
+        .container-images {
+            max-width: 100px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 250px);
+            grid-gap: 5px; /* Réduire l'espacement entre les images */
+            justify-content: center; /* Centrer les éléments horizontalement */
+            align-items: center; /* Centrer les éléments verticalement */
+        }
+        
+        .grid-container img {
+            max-width: 400px; /* Ajustez selon vos besoins */
+            max-height: 400px; 
+            display: block;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Nouveau style pour le formulaire */
+        #search-form {
+            text-align: left; /* Alignement à gauche */
+            margin-left: 20px; /* Marge à gauche pour l'espacement */
+            display: inline-block; /* Pour s'aligner correctement à gauche */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container-header">
+            <h1>CLOTHED.</h1>
+        </div>
+    </header>
+    <!-- Déplacez le formulaire en dehors de la div.container -->
+    <form id="search-form" method="post">
+        <select name="update_db" id="update_db">
+            <option value="False">False</option>
+            <option value="True">True</option>
+        </select>
+
+        <button type="submit">Chercher</button>
+    </form>
+
+    <div class = 'container-images'>
+        <div class="grid-container">
+
+        {% for image in imageList %}
+            <img src= {{ image }} >
+        {% endfor %}
+        
+     </div>
+    </div>
+</body>
+</html>
