@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import sys
 sys.path.append('..')
+sys.path.append('../..')
 import utilities.utilities_images as utilities_images
 import utilities.getter as getter
 import scripts.extract_objects as extract_objects
