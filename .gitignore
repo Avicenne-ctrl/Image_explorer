@@ -1,0 +1,21 @@
+# Environnements virtuels
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# Fichiers de configuration spécifiques à l'environnement (API keys, etc.)
+*.env
+
+# Caches Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+
+# Fichiers générés par le système d'exploitation
+.DS_Store  # macOS

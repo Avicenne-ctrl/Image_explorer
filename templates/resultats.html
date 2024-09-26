@@ -7,25 +7,39 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: Arial, sans-serif;
         }
         .container-header {
             text-align: center;
+            margin-top: 20px;
         }
+        /* Section pour l'image principale */
+        .main-image-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .main-image-container img {
+            max-width: 80%; /* Ajuster pour la taille de l'image principale */
+            height: auto;
+            border: 2px solid #ddd; /* Optionnel : bordure */
+            border-radius: 10px; /* Optionnel : coins arrondis */
+        }
+        /* Section pour la grille d'images */
         .grid-container {
-            position: absolute;
-            top : 40%;
-            left: 20%;
+            margin-top: 50px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-gap: 10px;
             padding: 20px;
-            max-width: 800px; /* Adjust this value for desired max width */
-            margin: 0 auto; /* Centers the grid in the page */
+            max-width: 80%; /* Ajuster la largeur maximale */
+            margin: 0 auto; /* Centrer la grille dans la page */
         }
         .grid-container img {
             width: 100%;
             height: auto;
-            object-fit: cover; /* Optional: adjust this for different image fit */
+            object-fit: cover; /* Pour ajuster le cadrage des images */
+            border: 2px solid #ddd; /* Optionnel : bordure */
+            border-radius: 8px; /* Optionnel : coins arrondis */
         }
         .result {
             text-align: center;
@@ -36,21 +50,23 @@
 <body>
     <header>
         <div class="container-header">
-            <h1>CLOTHED.</h1>
+            <h1>Image Explorer.</h1>
         </div>
     </header>
 
-<!--    <div class="result">
-        <h1>Résultats</h1>
-        {% for result in resultat %}
-            <p>{{ result }}</p>
-        {% endfor %}
-    </div>-->
+    <!-- Image principale -->
+    <div class="main-image-container">
+        <img src="{{ main_image }}" alt="Image principale">
+    </div>
 
+    <!-- Grille d'images en bas -->
     <div class="grid-container">
         {% for image in imagelist %}
-            <img src="{{ image }}" alt="Image">
+            <a href="{{ url_for('search_by_image', image_path=image) }}">
+                <img src="{{ image }}" alt="Image similaire">
+            </a>
         {% endfor %}
     </div>
+
 </body>
 </html>

@@ -60,14 +60,28 @@
 <body>
     <header>
         <div class="container-header">
-            <h1>CLOTHED.</h1>
+            <h1>Image Explorer.</h1>
         </div>
     </header>
     <!-- Déplacez le formulaire en dehors de la div.container -->
-    <form id="search-form" method="post">
+    <form id="search-form" method="post" enctype="multipart/form-data">
+        <label for="image-upload">Choisir une image :</label>
+        <input type="file" name="image" id="image-upload" accept="image/*" required>
+        
+        <label for="update_db">Mettre à jour la base :</label>
         <select name="update_db" id="update_db">
             <option value="False">False</option>
             <option value="True">True</option>
+        </select>
+
+        <label for="nb_similar">Nombre d'images similaires :</label>
+        <select name="nb_similar" id="nb_similar" required>
+            <option value="1">1</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
         </select>
 
         <button type="submit">Chercher</button>

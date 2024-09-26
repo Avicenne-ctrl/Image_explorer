@@ -1,40 +1,37 @@
 # import dependencies
-import pandas as pd
-import numpy as np
-import cv2
-import matplotlib.pyplot as plt
-from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_core.documents import Document
 import torch
-from torchvision import datasets, transforms
-import tensorflow as tf
-from tensorflow import keras
-from torch.utils.data import Subset
+from torchvision.models import ResNet18_Weights
 from ultralytics import YOLO
 import os
-
+import numpy
+import cv2
 import sys
 sys.path.append('..')
 sys.path.append('././.')
 import utilities.utilities_images as utilities_images
 import utilities.get_vector_store as get_vector_store
-import utilities.get_similar_test as get_similar_test
 import utilities.getter as getter
+device = torch.device('cpu')
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 PATH_FOLDER_IMG     = "./static/images/"
 PATH_DB             = "./static/vector_store"
 PATH_VECTOR_STORE   = "./static/vector_store/"
 
-EXTENSION_IMG       = ["jpeg"]
+EXTENSION_IMG       = ["jpeg", "png", "jpg"]
 
-BATCH_SIZE          = 4
-SIZE_IMG            = (512, 512)
+BATCH_SIZE          = 5
+SIZE_IMG            = (256, 256)
 
-MODEL_VECTORIZE_IMG = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
-MODEL_DETECT_OBJ    = model = YOLO('yolov8n.pt')
+MODEL_VECTORIZE_IMG = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', weights=ResNet18_Weights.DEFAULT)
+MODEL_DETECT_OBJ    = YOLO('yolov8n.pt')
 
+MODEL_VECTORIZE_IMG.to(device) 
+MODEL_DETECT_OBJ.to(device) 
 
+DICT_LABEL_YOLOV8 = {0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorcycle', 4: 'airplane', 5: 'bus', 6: 'train', 7: 'truck', 8: 'boat', 9: 'traffic light', 10: 'fire hydrant', 11: 'stop sign', 12: 'parking meter', 13: 'bench', 14: 'bird', 15: 'cat', 16: 'dog', 17: 'horse', 18: 'sheep', 19: 'cow', 20: 'elephant', 21: 'bear', 22: 'zebra', 23: 'giraffe', 24: 'backpack', 25: 'umbrella', 26: 'handbag', 27: 'tie', 28: 'suitcase', 29: 'frisbee', 30: 'skis', 31: 'snowboard', 32: 'sports ball', 33: 'kite', 34: 'baseball bat', 35: 'baseball glove', 36: 'skateboard', 37: 'surfboard', 38: 'tennis racket', 39: 'bottle', 40: 'wine glass', 41: 'cup', 42: 'fork', 43: 'knife', 44: 'spoon', 45: 'bowl', 46: 'banana', 47: 'apple', 48: 'sandwich', 49: 'orange', 50: 'broccoli', 51: 'carrot', 52: 'hot dog', 53: 'pizza', 54: 'donut', 55: 'cake', 56: 'chair', 57: 'couch', 58: 'potted plant', 59: 'bed', 60: 'dining table', 61: 'toilet', 62: 'tv', 63: 'laptop', 64: 'mouse', 65: 'remote', 66: 'keyboard', 67: 'cell phone', 68: 'microwave', 69: 'oven', 70: 'toaster', 71: 'sink', 72: 'refrigerator', 73: 'book', 74: 'clock', 75: 'vase', 76: 'scissors', 77: 'teddy bear', 78: 'hair drier', 79: 'toothbrush'}
+
+#print(MODEL_DETECT_OBJ.names)
 
 def vector_store_exist():
     """Check if the vector store exist and is not empty
@@ -73,8 +70,8 @@ def detect_object_dataset(path_img: list, model: str= MODEL_DETECT_OBJ):
             detected_objects (list):
                 list of numpy object detected
             
-            label_img (list):
-                list of label from which images the objects comes from
+            label_img (Dict):
+                dict with the list of label from which images the objects comes from
                 
         Example:
         --------
@@ -83,17 +80,59 @@ def detect_object_dataset(path_img: list, model: str= MODEL_DETECT_OBJ):
             
     """
     
-    label_img        = []
+    origin_img       = []
     detected_objects = []
+    label_img        = []
+    
+    
     for img in path_img:
         img_cv2 = cv2.imread(img)
-        boxes = utilities_images.extract_boxes_yolovn(model, img_cv2)
-        print(len(boxes))
-        for bounding_objects in boxes:
+        boxes, labels_boxes = utilities_images.extract_boxes_yolovn(model, img_cv2)
+        for bounding_objects, label_object in zip(boxes, labels_boxes):  # if no detected object, image not considerated
             detected_objects.append(utilities_images.bounding_yolovn(bounding_objects, img_cv2))
-            label_img.append(img)
+            origin_img.append(img)
+            label_img.append(DICT_LABEL_YOLOV8[label_object])
             
-    return detected_objects, label_img
+    return detected_objects, {"images_path": origin_img, "image_label" : label_img}
+
+def detect_object_query(img_cv2: numpy.ndarray, model: str= MODEL_DETECT_OBJ):
+    """Detect objects on images
+
+        Args:
+        ------
+            img_cv2 (numpy.ndarray): 
+                the cv2 query image
+                
+            model (str): 
+                the model to detect object (ex : yolov8)
+                
+        Returns:
+        --------
+            detected_objects (list):
+                list of numpy object detected
+            
+            label_img (Dict):
+                dict with the list of label from which images the objects comes from
+                
+        Example:
+        --------
+            >>> detect_object_dataset(path_img = [path/to/img1.png, path/to/img2.jpeg], model = YOLOV8)
+            >>> returns : 
+            
+    """
+    
+    detected_objects = []
+    label_img        = []
+    
+    
+    
+    boxes, labels_boxes = utilities_images.extract_boxes_yolovn(model, img_cv2)
+    for bounding_objects, label_object in zip(boxes, labels_boxes):  # if no detected object, image not considerated
+        detected_objects.append(utilities_images.bounding_yolovn(bounding_objects, img_cv2))
+        label_img.append(DICT_LABEL_YOLOV8[label_object])
+            
+    return detected_objects, {"image_label" : label_img}
+
 
 def init_search_engine_images(path_folder: str, 
                               path_store_db: str,
@@ -128,22 +167,24 @@ def init_search_engine_images(path_folder: str,
     # extract images from repo
     list_path_images, list_names = getter.get_extension_folder(path_folder, extension_img)
     
+    print(f"{len(list_path_images)} images found in folder")
+    
     # extract objects from images, and labels save from which images it comes from
     list_images, labels          = detect_object_dataset(list_path_images)
-        
+                
     # create dataloader, tensor object made of batch
     data_loader = utilities_images.create_dataloader_from_images(list_img  = list_images, 
-                                                                list_index = labels, 
+                                                                list_index = [""]*len(list_images), # we don't care about index here, only in vector store 
                                                                 batch_size = batch_size,
                                                                 size_img   = size_img)
-
+    
     # vectorizer from a pretrained resnet modified
     vectorizer = get_vector_store.ImageVectorizer(model_vectorize_img)
 
     # if db already exist or not
     if len(path_db) == 0:
         # Utilisez un DataLoader avec vos images
-        embeddings, labels = vectorizer.vectorize_images(data_loader)  # Vectorise les images dans le DataLoader
+        embeddings = vectorizer.vectorize_images(data_loader)  # Vectorise les images dans le DataLoader
         db = get_vector_store.create_images_vector_stores(embeddings, labels)
         get_vector_store.save_vector_store(db = db, path_store_db = path_store_db)
         
@@ -152,40 +193,54 @@ def init_search_engine_images(path_folder: str,
         
     return db, vectorizer, data_loader
 
-def search_engine_image(query: list, db: str, vectorizer: str, data_loader: str, nb_similar: int = 5):
+def search_engine_image(query: numpy.ndarray, 
+                        db: str, 
+                        vectorizer: str, 
+                        data_loader: str, 
+                        nb_similar: int = 5):
     
     # we detect objects in the query img
-    object_queries, _ = detect_object_dataset(query)
+    object_queries, dict_metadata = detect_object_query(query)
+    object_labels = dict_metadata["image_label"]
     n = len(object_queries)
-    
     print(f"{n} objects detected")
     
-    # we create the tensor dataloader for each objects detected
-    loader_one        = utilities_images.create_dataloader_from_images(object_queries, [""]*n, batch_size = n)
-    # we embed the dataloader
-    embedding_query, _       = vectorizer.vectorize_images(loader_one)
+    bounding_boxes, _ =utilities_images.extract_boxes_yolovn(model=MODEL_DETECT_OBJ, image= query)
+    draw_objects      = utilities_images.display_objects_image(query, bounding_boxes)
     
-    dict_results = {}
+    if n>0 : # object detected
     
-    # for each vector we search for the most similar among the database (db)
-    for i, embed in enumerate(embedding_query):
-        dict_obj = {"labels": [], "img": []}
+        # we create the tensor dataloader for each objects detected
         
-        result_doc  = db.similarity_search_by_vector(embed, nb_similar) 
+        loader_one        = utilities_images.create_dataloader_from_images(object_queries, [""]*n, batch_size = n)
+        print(loader_one)
+        # we embed the dataloader
+        embedding_query  = vectorizer.vectorize_images(loader_one)
         
-        for result in result_doc:        
-            position = int(result.metadata["image_position"])        
-            img, _ = utilities_images.get_image_from_batch(data_loader, position, BATCH_SIZE)
+        dict_results = {}
+        
+        # for each vector we search for the most similar among the database (db)
+        for i, embed in enumerate(embedding_query):
+            dict_obj = {"images_path": [], "labels": [], "img": []}
             
-            dict_obj["labels"].append(result.metadata["image_label"])
-            dict_obj["img"].append(img)
-                        
-        dict_results[f"object{i}"] = dict_obj
-        
-    return dict_results
-
-
-
+            metadata_filter = {"image_label": object_labels[i]}
+            result_doc  = db.similarity_search_by_vector(embed, nb_similar, metadata_filter) 
+            for result in result_doc:        
+                print(result.metadata)
+                position = int(result.metadata["image_position"])        
+                img, _ = utilities_images.get_image_from_batch(data_loader, position, BATCH_SIZE)
+                
+                dict_obj["images_path"].append(result.metadata["images_path"])
+                dict_obj["labels"].append(result.metadata["image_label"])
+                dict_obj["img"].append(img)
+                            
+            dict_results[object_labels[i]] = dict_obj
+            
+        return dict_results, draw_objects
+    
+    else:
+        print("no detected object")
+        return None
 
 
 
