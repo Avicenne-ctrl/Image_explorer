@@ -1,0 +1,15 @@
+torch==2.2.2
+torchvision==0.17.2
+opencv-python==4.9.0.80
+pandas==2.2.2
+numpy==1.26.4
+matplotlib==3.8.4
+langchain==0.2.11
+langchain-community==0.2.10
+langchain-core==0.2.26
+langchain-huggingface==0.0.3
+ultralytics==8.2.0
+faiss-cpu==1.8.0.post1
+Flask==3.0.3
+huggingface-hub==0.23.4
+tqdm==4.66.5
