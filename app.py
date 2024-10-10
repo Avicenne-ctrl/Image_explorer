@@ -4,9 +4,7 @@ import numpy as np
 from PIL import Image
 import sys
 sys.path.append('..')
-import utilities.utilities_images as utilities_images
-import utilities.getter as getter
-import scripts.extract_objects as extract_objects
+import scripts.search_engine_images as search_engine_images
 
 PATH_FOLDER_IMG  = "./static/images/"
 PATH_DB          = "./static/vector_store/"
@@ -31,21 +29,21 @@ def index():
         # Décoder l'image en format OpenCV
         image_cv2 = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
                 
-        if not extract_objects.vector_store_exist():
+        if not search_engine_images.vector_store_exist():
             print("not created")
-            db, vectorizer, data_loader = extract_objects.init_search_engine_images(PATH_FOLDER_IMG, 
+            db, vectorizer, data_loader = search_engine_images.init_search_engine_images(PATH_FOLDER_IMG, 
                                                                                     PATH_DB)
         elif update_db == "True":
             print("need update")
-            db, vectorizer, data_loader = extract_objects.init_search_engine_images(PATH_FOLDER_IMG, 
+            db, vectorizer, data_loader = search_engine_images.init_search_engine_images(PATH_FOLDER_IMG, 
                                                                                     PATH_DB)  
         else :
-            db, vectorizer, data_loader = extract_objects.init_search_engine_images(PATH_FOLDER_IMG, 
+            db, vectorizer, data_loader = search_engine_images.init_search_engine_images(PATH_FOLDER_IMG, 
                                                                                     PATH_DB, 
                                                                                     PATH_DB)  
 
             
-        images_results, draw_img = extract_objects.search_engine_image(query= image_cv2, 
+        images_results, draw_img = search_engine_images.search_engine_image(query= image_cv2, 
                                                                         db=db, 
                                                                         vectorizer=vectorizer, 
                                                                         data_loader=data_loader, 
@@ -65,14 +63,14 @@ def index():
 
 @app.route('/search_by_image')
 def search_by_image():
-    db, vectorizer, data_loader = extract_objects.init_search_engine_images(PATH_FOLDER_IMG, 
+    db, vectorizer, data_loader = search_engine_images.init_search_engine_images(PATH_FOLDER_IMG, 
                                                                                     PATH_DB, 
                                                                                     PATH_DB)  
     # Récupérer le chemin de l'image passée comme argument
     image_path = request.args.get('image_path')
     image_cv2 = cv2.imread(image_path)
     
-    images_results, draw_img = extract_objects.search_engine_image(query= image_cv2, 
+    images_results, draw_img = search_engine_images.search_engine_image(query= image_cv2, 
                                                                     db=db, 
                                                                     vectorizer=vectorizer, 
                                                                     data_loader=data_loader, 
