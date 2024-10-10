@@ -4,7 +4,6 @@ import numpy as np
 from PIL import Image
 import sys
 sys.path.append('..')
-sys.path.append('../..')
 import utilities.utilities_images as utilities_images
 import utilities.getter as getter
 import scripts.extract_objects as extract_objects
@@ -74,21 +73,24 @@ def search_by_image():
     image_cv2 = cv2.imread(image_path)
     
     images_results, draw_img = extract_objects.search_engine_image(query= image_cv2, 
-                                                                        db=db, 
-                                                                        vectorizer=vectorizer, 
-                                                                        data_loader=data_loader, 
-                                                                        nb_similar=5)
+                                                                    db=db, 
+                                                                    vectorizer=vectorizer, 
+                                                                    data_loader=data_loader, 
+                                                                    nb_similar=5)
         
     # save image input with object detection and then reload it to display it
     im = Image.fromarray(draw_img)
     im.save(f"./static/inputs/query.png")
     
-    # display similar objects for the first input detected object
-    key_result = list(images_results.keys())
-    image_result_first_object = list(set(images_results[key_result[0]]["images_path"]))
-    print(key_result[0], list(set(image_result_first_object)))
+    # display similar objects for the input detected object
+    print(images_results)
+    image_result_first_object = []
+    for obj in images_results.keys():
+        image_result_first_object += images_results[obj]["images_path"]
         
-    return render_template('resultats.html', main_image=f"./static/inputs/query.png", imagelist = image_result_first_object)
+    print(list(set(image_result_first_object)))
+        
+    return render_template('resultats.html', main_image=f"./static/inputs/query.png", imagelist = list(set(image_result_first_object)))
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=False)

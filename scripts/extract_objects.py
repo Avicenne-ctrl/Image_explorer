@@ -213,7 +213,6 @@ def search_engine_image(query: numpy.ndarray,
         # we create the tensor dataloader for each objects detected
         
         loader_one        = utilities_images.create_dataloader_from_images(object_queries, [""]*n, batch_size = n)
-        print(loader_one)
         # we embed the dataloader
         embedding_query  = vectorizer.vectorize_images(loader_one)
         
@@ -234,7 +233,7 @@ def search_engine_image(query: numpy.ndarray,
                 dict_obj["labels"].append(result.metadata["image_label"])
                 dict_obj["img"].append(img)
                             
-            dict_results[object_labels[i]] = dict_obj
+            dict_results[f"object_{i}"] = dict_obj
             
         return dict_results, draw_objects
     
