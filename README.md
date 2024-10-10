@@ -3,6 +3,8 @@
 ## Image Search Engine
 This repository implements an image search engine that leverages object detection and image vectorization using YOLO for object detection and ResNet for image vectorization. The engine creates a vector store to enable efficient image search based on similarity.
 
+![Project Logo](./assets/schema_png.png) 
+
 ### Features:
 - Object Detection: Detects objects in images using the YOLO model.
 - Image Vectorization: Vectorizes images using a pre-trained ResNet model.
