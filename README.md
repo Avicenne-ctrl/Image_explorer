@@ -1,11 +1,15 @@
 # Image_explorer
 
-## Image Search Engine
+## Image Search Engine : trying to copy Google Lens technology
+
 This repository implements an image search engine that leverages object detection and image vectorization using YOLO for object detection and ResNet for image vectorization. The engine creates a vector store to enable efficient image search based on similarity.
+
+![Project Logo](./assets/schema_image_search.png) 
 
 ### Features:
 - Object Detection: Detects objects in images using the YOLO model.
 - Image Vectorization: Vectorizes images using a pre-trained ResNet model.
+![Project Logo](./assets/schema_png.png) 
 - Vector Store Management: Creates and manages vector stores using FAISS for fast image similarity search.
 - Search Engine: Enables querying an image, detects objects, vectorizes them, and retrieves the most similar images from the database.  
 
