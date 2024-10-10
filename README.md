@@ -44,7 +44,8 @@ To use this repository, the following dependencies are required:
 
 ```python
 MODEL_VECTORIZE_IMG = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
-MODEL_DETECT_OBJ = YOLO('yolov8n.pt')```
+MODEL_DETECT_OBJ = YOLO('yolov8n.pt')
+```
 
 
 ### extract_objects.py : Functions Overview
@@ -69,7 +70,8 @@ label_img (list): Dict of Corresponding image labels.
 Example : 
 
 ```python
-detected_objects, label_img =  = detect_object_dataset(path_img = ["img1.png", "img2.jpeg"])```
+detected_objects, label_img =  = detect_object_dataset(path_img = ["img1.png", "img2.jpeg"])
+```
 
 
 `detect_object_query(img_cv2, model = YOLOV8)`
@@ -116,7 +118,8 @@ The database, image vectorizer, and DataLoader.
 Example : 
 
 ```python
-db, vectorizer, data_loader = init_search_engine_images(path_folder="./images", path_store_db="./vector_store")``
+db, vectorizer, data_loader = init_search_engine_images(path_folder="./images", path_store_db="./vector_store")
+```
 
 
 search_engine_image(query, db, vectorizer, data_loader, nb_similar=5)
@@ -136,7 +139,8 @@ A dictionary of results containing the labels and images of the most similar obj
 
 Example : 
 ```python
-results = search_engine_image(query=["query_image.jpg"], db=db, vectorizer=vectorizer, data_loader=data_loader)```
+results = search_engine_image(query=["query_image.jpg"], db=db, vectorizer=vectorizer, data_loader=data_loader)
+```
 
 
 init_search_engine_images(path_folder="./static/images", path_store_db="./static/vector_store")`
@@ -156,7 +160,8 @@ Example :
 
 ```python
 db, vectorizer, data_loader = init_search_engine_images(path_folder="./static/images", 
-                                                        path_store_db="./static/vector_store")```
+                                                        path_store_db="./static/vector_store")
+```
 
 
 `search_engine_image(query, db, vectorizer, data_loader, nb_similar=5) `                                       
@@ -178,11 +183,11 @@ draw_objects(numpy.ndarray): the query image with bounding boxes drew
 Example : 
 
 ```python
-dict_results, draw_objects = search_engine_image(query=["./query_images/query1.jpg"], db=db, vectorizer=vectorizer, data_loader=data_loader, nb_similar=5)```
+dict_results, draw_objects = search_engine_image(query=["./query_images/query1.jpg"], db=db, vectorizer=vectorizer, data_loader=data_loader, nb_similar=5)
+```
 
 
 License
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 Contributing
 Contributions are welcome! Please submit a pull request or open an issue to discuss your changes.
